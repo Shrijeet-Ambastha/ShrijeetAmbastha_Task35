@@ -21,14 +21,20 @@ app.use((req, res, next) => {
 app.use('/api/workouts', workoutRoutes);
 
 // connect to db
+// Remove or replace your old mongoose.connect() block with this:
+
+// 1. Establish the database connection globally
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    // listen for requests only after database connectivity succeeds
-    app.listen(process.env.PORT, () => {
-      console.log(`Connected to Database & Server listening on port ${process.env.PORT}`);
-    });
-  })
-  .catch((error) => {
-    console.log('Database connection error:', error);
+  .then(() => console.log('Connected to MongoDB Atlas successfully'))
+  .catch((error) => console.error('Database connection error:', error));
+
+// 2. ONLY call app.listen if running locally (not on Vercel)
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(process.env.PORT || 4000, () => {
+    console.log(`Local server listening on port ${process.env.PORT || 4000}`);
   });
+}
+
+// 3. Crucial for Vercel: Export the app instance
 module.exports = app;
+
